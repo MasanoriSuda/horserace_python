@@ -7,6 +7,9 @@ import re
 import urllib.request, urllib.error
 from tqdm import tqdm
 
+#非ライブラリ
+from racetable import object_race, object_this_year_race
+from jockeytable import jockey_mappings
 
 year_start = 2023
 year_end   = 2024
@@ -125,38 +128,7 @@ class Horse():
         return str(self.race_results_data_frame.iat[index,11])
 
     def getJockey(self,index):
-        #netkeibaのidを返す(頭の0は除外)
-        mappings = {'井上俊彦' : 837, #00837
-                    '荻野琢真' :1112, #01112
-                    '赤岡修次' :5074, #05074
-                    '五十嵐冬' :5091, #05091
-                    '左海誠二' :5199, #05199
-                    '今野忠成' :5230, #05230
-                    '繁田健一' :5269, #05269
-                    '服部茂史' :5286, #05286
-                    '森泰斗'   :5342, #05432
-                    '山崎誠士' :5365, #05365
-                    '矢野貴之' :5380, #05380
-                    '岩橋勇二' :5389, #05389
-                    '和田譲治' :5399, #05399
-                    '御神本訓' :5404, #05404
-                    '桑村真明' :5411, #05411
-                    '本田正重' :5443, #05443
-                    '阿部龍'   :5492, #05492
-                    '松井伸也' :5502, #05502
-                    '井上幹太' :5522, #05522
-                    '笹川翼'   :5524, #05524
-                    '石川倭'   :5534, #05534
-                    '張田昂'   :5549, #05549
-                    '保園翔也' :5553, #05553
-                    '野畑凌'   :5630, #05630
-
-                    '橋本直哉' :9001, #a017d(暫定)
-                    } 
-
-        #print(self.race_results_data_frame.iat[0,12])
-
-        for key, value in mappings.items():
+        for key, value in jockey_mappings.items():
             if key in self.race_results_data_frame.iat[index,12]:
                 return str(value)
         return "0"
@@ -273,9 +245,10 @@ class Horse():
                 #print(self.getTrainer())
                 #print(self.getHorseOwner())
 
-    def makeDataFrame(self, fixday):
+    def makeDataFrame(self, fixday,last_race_num):
         #print(self.race_results_data_frame.index)
 
+        counter = 0
         list_all = []
         for index  in self.race_results_data_frame.index:
             if(self.getDate(index) == self.race_date or fixday == False):
@@ -303,6 +276,8 @@ class Horse():
                     #print(self.getTrainer())
                     #print(self.getHorseOwner())
                     list_all.append(list)
+                    counter = counter + 1
+                    if(counter >= last_race_num): break
 
         return list_all
 
@@ -384,25 +359,13 @@ def getURL(horse_num):
     return url
 
 def getThisYearRace():
-    horse_nums        = [
-                            ["2021100815","2023/10/12"],#パンセ
-                            ["2021106935","2023/10/12"],#サンノトーレ
-                            ["2021100316","2023/10/12"],#アジアミッション 
-                            ["2021100034","2023/10/12"],#カタルシス
-                            ["2021104139","2023/10/12"],#アムクラージュ       
-                            ["2021105761","2023/10/12"],#スノーシュー
-                            ["2021100008","2023/10/12"],#ホークマン
-                            ["2021103951","2023/10/12"],#メイプルケンジ
-                            ["2021106020","2023/10/12"],#エドノビートイン
-                            ["2021104387","2023/10/12"],#ライゾマティクス                                          
-                            ["2021101290","2023/10/12"],#モンゲースパイ
-                        ]
+
     
-    for horse_num in horse_nums:
+    for horse_num in object_this_year_race:
         df_ = pd.DataFrame()
         horse = Horse(horse_num[0],"牡","2",horse_num[1])
         horse.initializeHorse()
-        list = horse.makeDataFrame(False)
+        list = horse.makeDataFrame(False, 1)
         df_ = df_.append(list, ignore_index=True)
         print(horse_num[0])
         print(df_)
@@ -429,63 +392,23 @@ def getLast10YearRace():
     for horse_num in horse_nums:
         horse = Horse(horse_num[0],"牡","2",horse_num[1])
         horse.initializeHorse()
-        list = horse.makeDataFrame(True)
+        list = horse.makeDataFrame(True, 1)
         df_ = df_.append(list, ignore_index=True)
 
     print(df_)
     df_.to_csv("last10years.csv")
 
 def getLast3YearRaceAllHorse():
-    horse_nums        = [
-                         #["2011105041","2013/10/09"],#ストーンリバー
-                         #["2012103422","2014/10/15"],#ストーンリバー
-                         #["2013103885","2015/10/21"],#ストーンリバー
-                         #["2014101408","2016/10/05"],#ストーンリバー
-                         #["2015102718","2017/10/11"],#リコーワルサー
-                         #["2016100981","2018/10/17"],#ミューチャリー
-                         #["2017106186","2019/10/22"],#リーチ
-                         ["2018100548","2020/10/14"],#リーチ 
-                         ["2018106265","2020/10/14"],#セイカメテオポリス 
-                         ["2018104297","2020/10/14"],#
-                         ["2018101610","2020/10/14"],#
-                         ["2018100538","2020/10/14"],#
-                         ["2018101832","2020/10/14"],#
-                         ["2018103889","2020/10/14"],#
-                         ["2018105632","2020/10/14"],#
-                         ["2018101265","2020/10/14"],#
-                         ["2018103742","2020/10/14"],#
-                         ["2018102189","2020/10/14"],#
-                         ["2018100753","2020/10/14"],#                         
-                         ["2018104523","2020/10/14"],#                        
-                         ["2019106611","2021/10/13"],#シルトプレ
-                         ["2019101115","2021/10/13"],#
-                         ["2019104404","2021/10/13"],#
-                         ["2019102021","2021/10/13"],#
-                         ["2019104402","2021/10/13"],#
-                         ["2019100930","2021/10/13"],#
-                         ["2019101048","2021/10/13"],#
-                         ["2019100230","2021/10/13"],#
-                         ["2019105589","2021/10/13"],#                                                  
-                         ["2020104196","2022/10/12"],#ヒーローコール
-                         ["2020102237","2022/10/12"],#
-                         ["2020105092","2022/10/12"],#
-                         ["2020103179","2022/10/12"],#
-                         ["2020105017","2022/10/12"],#
-                         ["2020102495","2022/10/12"],#
-                         ["2020100825","2022/10/12"],#
-                         ["2020105359","2022/10/12"],#
-                         ["2020109007","2022/10/12"],#                                                                                                                                                                               
-                         ]
     
     df_ = pd.DataFrame()
     list_all = []
     list_label = ['sex','age','place','weather','recenum','horsenum','odds','popularity','result','jockey','weight','dirt','distance','track','time','farlong','bweight','incdec']
     list_all.append(list_label)
     df_ = df_.append(list_all, ignore_index=True)    
-    for horse_num in horse_nums:
+    for horse_num in object_race:
         horse = Horse(horse_num[0],"牡","2",horse_num[1])
         horse.initializeHorse()
-        list = horse.makeDataFrame(True)
+        list = horse.makeDataFrame(True, 1)
         df_ = df_.append(list, ignore_index=True)
 
     print(df_)
@@ -527,7 +450,8 @@ def WakamushaLastTenYears():
 def main():
 
     #getLatestTenYearsRace()
-    getLast3YearRaceAllHorse()
+    #getLast3YearRaceAllHorse()
+    getThisYearRace()
 
 def main2():
     print("start")
