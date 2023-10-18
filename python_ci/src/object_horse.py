@@ -12,6 +12,7 @@ import datetime
 from racetable import object_race, object_this_year_race
 from jockeytable import jockey_mappings
 from horsetable import horse_mappings
+from racetrack import racetrack_mappings
 
 def getHorseURL(horse_num):
     url = "https://db.netkeiba.com/horse/" + horse_num
@@ -103,9 +104,7 @@ class Horse():
         return self.race_results_data_frame.iat[index,0]
     
     def getPlace(self,index):
-        mappings = {'札幌':1,'門別':30,'盛岡':35, '浦和': 42, '船橋': 43, '大井': 44, '川崎':45}
-
-        for key, value in mappings.items():
+        for key, value in racetrack_mappings.items():
             if key in self.race_results_data_frame.iat[index,1]:
                 return str(value)
         return "0"
