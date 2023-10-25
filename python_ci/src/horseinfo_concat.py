@@ -13,8 +13,9 @@ from enum import Enum
 
 #非ライブラリ
 from racetrack import racetrack_mappings
-from horserace_util import getRaceResultLocal,getRaceResultJRA, getHorseInfo
+from horserace_util import getRaceResultLocal,getRaceResultJRA, getHorseInfo, getDateForDataAnalysis
 from jockeytable import jockey_mappings
+from racetable import *
 
 class HorseIdNumInfo(Enum):
     HORSE_ID_NUMINFO_HORSE_ID       =  'horse_id' #馬id
@@ -87,475 +88,77 @@ class HORSE(Enum):
     HORSE_TRAINER ='調教師'
 
 
+#対象レースの5戦を無理やり取得するためのパラメータ
+FORCE_BREAK = False
+horse_race_lists___ =[
+    ["2023/11/03","JBCCLASSIC_2023",horse_id_list_2023_jbc_plan]
+]
+
+horse_race_lists =[
+        ["2017/11/03","JBCCLASSIC_2017",horse_id_list_JBC2017],
+]
+
+horse_race_lists_ =[
+    ["2021/07/14","JAPANDIRTDURBY_2021",horse_id_list_2021_jdd],
+    ["2022/07/13","JAPANDIRTDURBY_2022",horse_id_list_2022_jdd],
+    ["2023/07/12","JAPANDIRTDURBY_2023",horse_id_list_2023_jdd],    
+    ["2014/06/25","TEIOU_2014",horse_id_list_teiou_2014], 
+    ["2015/06/24","TEIOU_2015",horse_id_list_teiou_2015], 
+    ["2016/06/29","TEIOU_2016",horse_id_list_teiou_2016], 
+    ["2017/06/28","TEIOU_2017",horse_id_list_teiou_2017], 
+    ["2018/06/27","TEIOU_2018",horse_id_list_teiou_2018], 
+    ["2019/06/26","TEIOU_2019",horse_id_list_teiou_2019], 
+    ["2020/06/24","TEIOU_2020",horse_id_list_teiou_2020], 
+    ["2021/06/30","TEIOU_2021",horse_id_list_teiou_2021], 
+    ["2022/06/29","TEIOU_2022",horse_id_list_teiou_2022], 
+    ["2023/06/28","TEIOU_2023",horse_id_list_teiou_2023],
+    ["2018/12/02","CHAMPIONSCUP_2018",horse_id_list_2018_championscup],
+    ["2019/12/01","CHAMPIONSCUP_2019",horse_id_list_2019_championscup],
+    ["2020/12/06","CHAMPIONSCUP_2020",horse_id_list_2020_championscup],
+    ["2021/12/05","CHAMPIONSCUP_2021",horse_id_list_2021_championscup],
+    ["2022/12/04","CHAMPIONSCUP_2022",horse_id_list_2022_championscup],      
+    ["2013/11/04","JBCCLASSIC_2013",horse_id_list_JBC2013],
+    ["2014/11/03","JBCCLASSIC_2014",horse_id_list_JBC2014],          
+    ["2015/11/03","JBCCLASSIC_2015",horse_id_list_JBC2015],
+    ["2016/11/03","JBCCLASSIC_2016",horse_id_list_JBC2016],
+    ["2017/11/03","JBCCLASSIC_2017",horse_id_list_JBC2017],
+    ["2018/11/04","JBCCLASSIC_2018",horse_id_list_JBC2018],
+    ["2019/11/04","JBCCLASSIC_2019",horse_id_list_JBC2019],          
+    ["2020/11/03","JBCCLASSIC_2020",horse_id_list_JBC2020],
+    ["2021/11/03","JBCCLASSIC_2021",horse_id_list_JBC2021],
+    ["2022/11/03","JBCCLASSIC_2022",horse_id_list_JBC2022],
+    ["2013/12/29","DAISHOUTEN_2013",horse_id_list_2013_daishouten],
+    ["2014/12/29","DAISHOUTEN_2014",horse_id_list_2014_daishouten],
+    ["2015/12/29","DAISHOUTEN_2015",horse_id_list_2015_daishouten],
+    ["2016/12/29","DAISHOUTEN_2016",horse_id_list_2016_daishouten],
+    ["2017/12/29","DAISHOUTEN_2017",horse_id_list_2017_daishouten],
+    ["2018/12/29","DAISHOUTEN_2018",horse_id_list_2018_daishouten],
+    ["2019/12/29","DAISHOUTEN_2019",horse_id_list_2019_daishouten],
+    ["2020/12/29","DAISHOUTEN_2020",horse_id_list_2020_daishouten],
+    ["2021/12/29","DAISHOUTEN_2021",horse_id_list_2021_daishouten],
+    ["2022/12/29","DAISHOUTEN_2022",horse_id_list_2022_daishouten],
+    ["2021/01/27","KAWASAKI_2021",horse_id_list_2021_kawasaki],
+    ["2022/02/02","KAWASAKI_2022",horse_id_list_2022_kawasaki],
+    ["2023/02/01","KAWASAKI_2023",horse_id_list_2023_kawasaki],
+#    ["2023/11/03","JBCCLASSIC_2023",horse_id_list_2023_jbc_plan]
+]
 
 def main():
     print("start")
 
+    for list in horse_race_lists:
+        makeRaceInfo(list[0],list[1],list[2])    
+
+def makeRaceInfo(day,racename,horse_id_list):
+    print("start")
+
     df = pd.DataFrame()
+    OBJECT_DAY = day
+    RACE_NAME  = racename
+    horse_id_list = horse_id_list
 
-    horse_id_list_18 = [
-        2013104055,
-        2015104273,
-        2014103385,
-        2012104314,
-        2010102446,
-        2011104994,
-        2015100122,
-        2013101861,
-        2011104995,
-        2012104367,
-        #2012104019,
-        #2013103863,
-        #2012110098,
-        #2012101830,
-        #2010104098,
-        #2011104326,
-    ]
-
-
-    horse_id_list_JBC19 = [
-        2015104879,
-        2015104273,
-        2012104019,
-        2013104246,
-        2013109025,
-        2015105608,
-        2015102374,
-        2014106448,
-        2011104326,
-        #2016105664,
-        #2011105236,
-    ]
-
-    #金沢
-    horse_id_list_JBC2021 = [
-                     2016100981,
-                     2015104273,
-                     2015104879,
-                     2017101010,
-                     2013104055,
-                     2016104163,
-                     2017105292,
-                     2015100122,
-                     2015103370,
-                     2017106443,
-                     2016101955,
-                     2017105956,
-                     ]
-
-    #盛岡
-    horse_id_list_JBC2022 = [
-                     2017101010,
-                     2019104678,
-                     2019104245,
-                     2018101012,
-                     2017106404,
-                     2016101455,
-                     2019105656,
-                     2018104033,
-                     2018106265,
-                     2017102025,
-                     2014104735,
-                     2013101965,
-                     2016105316,
-                     2016103323,
-                     2017102571,
-                     ]
-
-    #大井
-    horse_id_list_JBC2020 = [
-        2016104458,
-        2015104273,
-        2015104879,
-        2016100981,
-        2017105292,
-        2016103957,
-        2015102390,
-        2015105868,
-        2010102446,
-        2012104314,
-        2012104019,
-        2013104755,
-        2015102946,
-        2012100627,
-        2012104678,
-    ]
-
-    #2019_帝王賞
-    horse_id_list_teiou_2019 = [
-        2015104273,
-        2015104879,
-        2012104314,
-        2012101502,
-        2015105676,
-        2014104052,
-        2010102446,
-        2011101738,
-        2012104367,
-        2013104755,
-        2014104469,
-        2013104508,
-        2012110098,
-        2011104326,
-    ]
-
-    #2020_帝王賞
-    horse_id_list_teiou_2020 = [
-        2016104458,
-        2015104273,
-        2015104879,
-        2016106260,
-        2012104314,
-        2013104055,
-        2012101502,
-        2013109025,
-        2013104755,
-        2015104189,
-        2016100661,
-        2014104582,
-        2015105676,
-        2015102249,
-    ]
-
-    #2021_帝王賞
-    horse_id_list_teiou_2021 = [
-        2017101010,
-        2012104314,
-        2014100656,
-        2016100981,
-        2015104273,
-        2015104879,
-        2016101455,
-        2016104426,
-        2017105292,
-        2016104163,
-        2016100661,
-        2017103550,
-        2015102249,
-    ]
-
-    #2022_帝王賞
-    horse_id_list_teiou_2022 = [
-        2017106404,
-        2015104879,
-        2015104273,
-        2014100656,
-        2017101010,
-        2012104314,
-        2015104526,
-        2016101055,
-        2016101455,
-    ]
-
-    #2023_帝王賞→どうなるか学習したい
-    horse_id_list_teiou_2023 = [
-        2017106404,
-        2019104678,
-        2017101010,
-        2017103290,
-        2017101184,
-        2017105395,
-        2017105396,
-        2019101623,
-        2019103502,
-        2018103811,
-        2017109038,
-        2016101455,
-
-    ]
-
-    #2013東京大賞典
-    horse_id_list_2013_daishouten =[
-        2009100921,
-        2006106794,
-        2007100191,
-        2010110052,
-        2006106201,
-        2008102944,
-        2009102405,
-        2006100953,
-        2006103167,
-    ]
-
-    #2014東京大賞典
-    horse_id_list_2014_daishouten =[
-        2009100921,
-        2010106548,
-        2008101041,
-        2011102947,
-        2008102944,
-        2007103394,
-        2006106794,
-        2010104098,
-        2009102405,
-        2005103453,
-        2006106156,
-        2008105433,
-        2010103370,
-        2006100953,
-        2010100898,
-        #000a0127d6,
-    ]
-
-    #2015東京大賞典
-    horse_id_list_2015_daishouten =[
-        2010102446,
-        2009100921,
-        2006106794,
-        2010106548,
-        2009102179,
-        2011102947,
-        2007103864,
-        2008101041,
-        2010104996,
-        2009105650,
-        2009102405,
-        2009103308,
-        2009103120,
-        2010100266,
-    ]
-
-    #2016東京大賞典
-    horse_id_list_2016_daishouten =[
-        2012110098,
-        2010110078,
-        2010102446,
-        2012104314,
-        2010106548,
-        2012101974,
-        2011102128,
-        2011102947,
-        2013105190,
-        2009104054,
-        2012106362,
-        2008102828,
-        2011102186,
-        2010104087,
-    ]
-
-
-    #2017東京大賞典
-    horse_id_list_2017_daishouten =[
-        2010106548,
-        2010102446,
-        2013104055,
-        2012110098,
-        2013101999,
-        2012101502,
-        2010104916,
-        2014104453,
-        2013105053,
-        2013104755,
-        2013100291,
-        2014106418,
-        2013105190,
-        2013101922,
-        2009110017,
-        2008102895,
-    ]
-
-    #2018東京大賞典
-    horse_id_list_2018_daishouten =[
-        2015104273,
-        2013106119,
-        2013104055,
-        2010102446,
-        2015102979,
-        2014104469,
-        2015105608,
-        2011102464,
-        2015105676,
-        2012110098,
-        2010104098,
-        2015102249,
-        2011102489,
-        2010105981,
-        #2014101639,
-        2014100688,
-    ]
-
-    #2019東京大賞典
-    horse_id_list_2019_daishouten =[
-        2015104273,
-        2012104314,
-        2015105676,
-        2013106119,
-        2015102374,
-        2014103477,
-        2013100291,
-        2013104055,
-        2015110103,
-        2013105190,
-        2013109093,
-        2008200010,
-        2013101999,
-    ]
-
-    #2020東京大賞典
-    horse_id_list_2020_daishouten =[
-        2015104273,
-        2016104163,
-        2012104882,
-        2014102787,
-        2016100981,
-        2017101010,
-        2013103324,
-        2016103957,
-        2015105676,
-        2015105608,
-        2012104314,
-        2017105292,
-        2014100629,
-        2015100106,
-        2013105471,
-        2014103284,
-    ]
-
-    #2021東京大賞典
-    horse_id_list_2021_daishouten =[
-        2015104273,
-        2014100656,
-        2012104882,
-        2016100981,
-        2016102276,
-        2014104259,
-        2013105053,
-        2014106474,
-        2016103957,
-        2012104314,
-        2018105679,
-        2014100629,
-        2018103898,
-        2014103284,
-        2015103370,
-
-    ]
-
-    #2022東京大賞典
-    horse_id_list_2022_daishouten =[
-        2017103843,
-        2019101623,
-        2017106404,
-        2017100988,
-        2017105395,
-        2017100024,
-        2018104021,
-        2017103602,
-        2019103502,
-        2016104163,
-        2017109038,
-        2015104417,
-        2016106602,
-        2016105093,
-    ]
-
-    #2021川崎記念
-    horse_id_list_2021_kawasaki =[
-        2016104163,
-        2015104273,
-        2017105292,
-        2013105053,
-        2016100981,
-        2016102276,
-        2016103957,
-        2013103324,
-        2010106550,
-    ]
-
-    #2022川崎記念
-    horse_id_list_2022_kawasaki =[
-        2015104879,
-        2014105850,
-        2017105356,
-        2018104059,
-        2016104163,
-        2017104867,
-        2016103957,
-        2015102374,
-        2014109171,
-        2014104332,
-        2013104055,
-        2015102249,
-    ]
-
-    #2023川崎記念
-    horse_id_list_2023_kawasaki =[
-        2017103843,
-        2017101010,
-        2016105885,
-        2017103942,
-        2017105395,
-        2015104526,
-        2019104245,
-        2019101623,
-        2014105850,
-        2018103756,
-    ]
-
-    #2022チャンピョンズカップ
-    horse_id_list_2020_championscup =[
-        2015104879,
-        2013106119,
-        2014104052,
-        2016104458,
-        2014110031,
-        2017110151,
-        2013105399,
-        2015104107,
-        2015100318,
-        2015110086,
-        2014100656,
-        2014106474,
-        2014104259,
-        2013106094,
-        2015103248,
-        2013103671,
-    ]
-    #2022チャンピョンズカップ
-    horse_id_list_2021_championscup =[
-        2017101010,
-        2015104879,
-        2014104259,
-        2014104052,
-        2014106474,
-        2016101455,
-        2017106404,
-        2015104526,
-        2013105399,
-        2016104163,
-        2017110151,
-        2018105233,
-        2013104055,
-        2014100656,
-        2017100988,
-        2017105292,
-    ]
-
-    #2022チャンピョンズカップ
-    horse_id_list_2022_championscup =[
-        2017105396,
-        2019104678,
-        2019100630,
-        2017101010,
-        2018103528,
-        2017100988,
-        2016100617,
-        2019101623,
-        2016101455,
-        2017101719,
-        2015104417,
-        2018105251,
-        2015105868,
-        2014106474,
-        2018105365,
-    ]
-
-
-    OBJECT_DAY = "2020/12/06"
-    RACE_NAME  = "CHAMPIONSCUP_2020"
-    horse_id_list = horse_id_list_2020_championscup
-
-    teiou_2023_df = pd.DataFrame()
+    teiou_train_2023_df = pd.DataFrame()
+    teiou_test_2023_df = pd.DataFrame()
 
     jbc_counter = 202001
     for horse_id in horse_id_list:
@@ -582,9 +185,10 @@ def main():
         sex          =[]
         age          =[]
         date         =[]
-        place        =[]#後でtrackに変える
-        track        =[]#後でtrackに変える
-        weather      =[]#
+        dateforda    =[]
+        place        =[]
+        track        =[]
+        weather      =[]
         race_num     =[]
         horse_race_anim=[]
         horse_num=[]
@@ -600,13 +204,28 @@ def main():
         furlong3=[]
         horse_weight=[]
         weight_incdec = []
+        same_track = []
+        g1_age3 = []
+        g2_age3 = []
+        g3_age3 = []
+        g1_age4 = []
+        g2_age4 = []
+        g3_age4 = []
+        money   = []
 
         #レースから照合するためのパラメータを取得
         for tmp_place in horse_info_data_frame['開催']:
             horse_id_set.append(horse_id)
 
         for tmp_place in horse_info_data_frame['開催']:
-            place.append(tmp_place)
+            tmp2_place = tmp_place
+            place.append(tmp2_place)
+
+        for tmp_place in horse_info_data_frame['開催']:
+            if(tmp_place == '大井'):
+                same_track.append(1)
+            else:
+                same_track.append(0)
 
         for tmp_date in horse_info_data_frame['日付']:
             date.append(tmp_date)
@@ -636,9 +255,46 @@ def main():
             else:
                 dirt_grass.append('2')
 
+        #各グレードレースへの出場経験を確認する
+        for racename in horse_info_data_frame['レース名']:
+            if ('(G3)' in racename):
+                if('ユニコーン' in racename or
+                   'レパード' in racename):
+                    g3_age3.append(1)
+                    g3_age4.append(0)
+                else:
+                    g3_age3.append(0)
+                    g3_age4.append(1)
+            else:
+                g3_age3.append(0)
+                g3_age4.append(0)                
+
+            if ('(G2)' in racename):
+                if('関東オークス' in racename or
+                   '兵庫チャンピョン' in racename):
+                    g2_age3.append(1)
+                    g2_age4.append(0)
+                else:
+                    g2_age3.append(0)
+                    g2_age4.append(1)
+            else:
+                g2_age3.append(0)
+                g2_age4.append(0)                      
+
+            if ('(G1)' in racename):
+                if('ジャパンダートダ' in racename):
+                    g1_age3.append(1)
+                    g1_age4.append(0)
+                else:
+                    g1_age3.append(0)
+                    g1_age4.append(1)   
+            else:
+                g1_age3.append(0)
+                g1_age4.append(0) 
+
         for tmp2_dirt_or_grass in horse_info_data_frame['距離']:
-            tmp_dirt_or_grass = tmp2_dirt_or_grass[1:]
-            distance.append(tmp_dirt_or_grass)
+            length = tmp2_dirt_or_grass[1:]
+            distance.append(length)
 
 
         for tmp2_dirt_or_grass in horse_info_data_frame['馬場']:
@@ -650,14 +306,28 @@ def main():
         for tmp_furlong in horse_info_data_frame['上り']:
             furlong3.append(tmp_furlong)
 
-
+        for tmp_money in horse_info_data_frame['賞金']:
+            tmp2_money = tmp_money
+            if math.isnan(tmp_money):
+                tmp2_money = 0.0
+            #money_split_list = tmp_money.split(',.')
+            #if(len(money_split_list)==2):
+            #    money_num = int(money_split_list[0])
+            #else:
+            #    money_num = int(money_split_list[0])*1000 + int(money_split_list[1])
+            money.append(tmp2_money)
         #調教師を追加したい→転厩の可能性があるので、ここでアペンド
         #オーナーを追加したい→別ファイル
 
+
+        #各レース情報を別で引っ張ってくる
         for num in range(len(date)):
             hasraceinfo = True
             tmp = date[num].split('/')
-            print(type(tmp[0]))
+            #print(type(tmp[0]))
+
+            dateforda.append(getDateForDataAnalysis(int(tmp[0]),int(tmp[1]),int(tmp[2])))
+            dateforda
 
             if len(place[num]) == 3  :
                 if(place[num] =='韓国'):
@@ -725,7 +395,7 @@ def main():
 
                 tmp_kaisai    = str(tmp_kaisai) if  tmp_kaisai >= 10 else "0" +  str(tmp_kaisai)
                 tmp_week      = str(tmp_week) if  tmp_week >= 10 else "0" +  str(tmp_week)
-                tmp_race      = str(race_num[num]) if  race_num[num] >= 10 else "0" +  str(race_num[num])
+                tmp_race      = str(race_num[num]) if  int(race_num[num]) >= 10 else "0" +  str(race_num[num])
 
                 race_id = tmp[0]+str(tmp_day)+str(tmp_kaisai)+(tmp_week) + str(tmp_race)#年+開催+週　回
 
@@ -785,11 +455,11 @@ def main():
                 print(tmp_each_race_df['性齢'].values[0])
                 tmp_sex = tmp_each_race_df['性齢'].values[0][0]
                 if(tmp_sex == '牡'):
-                    sex.append('1')
-                elif(tmp_sex == '牝'):
-                    sex.append('2')
-                elif(tmp_sex == 'セ'):
                     sex.append('3')
+                elif(tmp_sex == '牝'):
+                    sex.append('1')
+                elif(tmp_sex == 'セ'):
+                    sex.append('2')
                 elif(tmp_sex == '牡'):
                     sex.append('0')
 
@@ -817,12 +487,18 @@ def main():
                 tmp_horse_race_anim = tmp_each_race_df['人気'].values[0]
                 popularity.append(tmp_horse_race_anim)
 
-                tmp_order = tmp_each_race_df['着順'].values[0]
-                order.append(tmp_order)
+                tmp_order = str(tmp_each_race_df['着順'].values[0]).split('(')
+                tmp2_order = int(tmp_order[0])
+                tmp3_order      = '1' if  tmp2_order <= 1 else "0"
+                order.append(tmp3_order)
 
                 tmp2_jockey = tmp_each_race_df['騎手'].values[0]
                 print(type(tmp2_jockey))
-                tmp_jockey = jockey_mappings[tmp2_jockey]
+                try:
+                    tmp_jockey = jockey_mappings[tmp2_jockey]
+                except:
+                    tmp_jockey = 0
+
                 jockey.append(tmp_jockey)
 
                 tmp_weight = tmp_each_race_df['斤量'].values[0]
@@ -872,6 +548,8 @@ def main():
         loc = len(horse_info_data_frame2.columns)
         horse_info_data_frame2.insert(loc, 'date', date)
         loc = len(horse_info_data_frame2.columns)
+        horse_info_data_frame2.insert(loc, 'dateforda', dateforda)
+        loc = len(horse_info_data_frame2.columns)
         horse_info_data_frame2.insert(loc, 'track', track)        
         loc = len(horse_info_data_frame2.columns)
         horse_info_data_frame2.insert(loc, 'weather', weather)
@@ -906,6 +584,22 @@ def main():
         horse_info_data_frame2.insert(loc, 'horse_weight', horse_weight)
         loc = len(horse_info_data_frame2.columns)
         horse_info_data_frame2.insert(loc, 'weight_incdec', weight_incdec)
+        loc = len(horse_info_data_frame2.columns)
+        horse_info_data_frame2.insert(loc, 'same_track', same_track)
+        loc = len(horse_info_data_frame2.columns)
+        horse_info_data_frame2.insert(loc, 'g1_age3', g1_age3)
+        loc = len(horse_info_data_frame2.columns)
+        horse_info_data_frame2.insert(loc, 'g2_age3', g2_age3)
+        loc = len(horse_info_data_frame2.columns)
+        horse_info_data_frame2.insert(loc, 'g3_age3', g3_age3)        
+        loc = len(horse_info_data_frame2.columns)
+        horse_info_data_frame2.insert(loc, 'g1_age4', g1_age4)
+        loc = len(horse_info_data_frame2.columns)
+        horse_info_data_frame2.insert(loc, 'g2_age4', g2_age4)
+        loc = len(horse_info_data_frame2.columns)
+        horse_info_data_frame2.insert(loc, 'g3_age4', g2_age4)
+        loc = len(horse_info_data_frame2.columns)
+        horse_info_data_frame2.insert(loc, 'money',  money)
 
         print("---")
         print(horse_info_data_frame)
@@ -919,31 +613,56 @@ def main():
         #print(horse_info_data_frame2.iloc[0:5,:])
 
         counter = 0
+
         for index in range (0,len(horse_info_data_frame2)):
+            findIndex = False
             hoge2 = horse_info_data_frame2.iloc[index,3]
             print(hoge2)
-            if hoge2  == OBJECT_DAY:
+            #
+            if hoge2  == OBJECT_DAY or FORCE_BREAK == True:
+                findIndex = True
                 break
             else:
                 counter = counter +1
 
-        counter_plus_5 = counter + 5
-
-        print(horse_info_data_frame2.iloc[counter:counter_plus_5,:])
-
-
-        if(teiou_2023_df.empty == False):
-            teiou_2023_df = teiou_2023_df.append(horse_info_data_frame2.iloc[counter:counter_plus_5,:])
+        if findIndex == False:
+            counter=0
+            counter_last_5 = counter
+            counter_last5_plus_5 = counter_last_5 + 5
         else:
-            teiou_2023_df = horse_info_data_frame2.iloc[counter:counter_plus_5,:]
+            counter_last_5 = counter + 1
+            counter_last5_plus_5 = counter_last_5 + 5
 
-        horse_info_new_path ='/home/msuda/workspace/vscode/horserace/python_ci/csv/horse_id_new/JBC2022/' + str(race_id) +'.csv'
-        horse_info_data_frame2.iloc[counter:counter_plus_5,:].to_csv(horse_info_new_path)
+        print('---------------train_data---------------')
+        print(horse_info_data_frame2.iloc[counter_last_5:counter_last5_plus_5,:])
+        print('---------------end_train_data-----------')
+
+        print('---------------test_data---------------')
+        print(horse_info_data_frame2.iloc[counter:counter+1,:])
+        print('---------------end_test_data-----------')
+
+        #訓練データ
+        teiou_train_2023_df = teiou_train_2023_df.append(horse_info_data_frame2.iloc[counter_last_5:counter_last5_plus_5,:])
+        horse_info_new_path ='/home/msuda/workspace/vscode/horserace/python_ci/csv/horse_id_new/JBC2022/'+ 'train_' + str(race_id) +'.csv'
+        horse_info_data_frame2.iloc[counter_last_5:counter_last5_plus_5,:].to_csv(horse_info_new_path)
+
+
+        #テストデータ
+        if findIndex == True:
+            horse_info_new_path ='/home/msuda/workspace/vscode/horserace/python_ci/csv/horse_id_new/JBC2022/'+ 'test_' + str(race_id) +'.csv'
+            horse_info_data_frame2.iloc[counter:counter+1,:].to_csv(horse_info_new_path)
+            teiou_test_2023_df = teiou_test_2023_df.append(horse_info_data_frame2.iloc[counter:counter+1,:])
+        else:
+            print("test data not made")
 
         jbc_counter = jbc_counter + 1
 
-    horse_info_new_path ='/home/msuda/workspace/vscode/horserace/python_ci/csv/horse_id_new/JBC2022/'+RACE_NAME+'.csv'
-    teiou_2023_df.to_csv(horse_info_new_path)
+    horse_info_new_path ='/home/msuda/workspace/vscode/horserace/python_ci/csv/horse_id_new/JBC2022/'+'train_'+RACE_NAME+'.csv'
+    teiou_train_2023_df.to_csv(horse_info_new_path)
+
+    if(teiou_test_2023_df.empty != True):
+        horse_info_new_path ='/home/msuda/workspace/vscode/horserace/python_ci/csv/horse_id_new/JBC2022/'+'test_'+RACE_NAME+'.csv'
+        teiou_test_2023_df.to_csv(horse_info_new_path)
 
 
 if __name__ == "__main__":

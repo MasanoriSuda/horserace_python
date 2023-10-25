@@ -9,17 +9,16 @@ from tqdm import tqdm
 import datetime
 
 #非ライブラリ
-from racetable import object_this_year_race
-from object_horse import Horse
-from horsetable import horse_mappings
+#from racetable import object_this_year_race
+#from object_horse import Horse
 from racetrack import racetrack_mappings
 
-def convertFromHorseNameToHorseID(horsename):
-    for key, value in horse_mappings.items():
-        if key == horsename:
-            return value
-
-    return 0
+#def convertFromHorseNameToHorseID(horsename):
+#    for key, value in horse_mappings.items():
+#        if key == horsename:
+#            return value
+#
+#    return 0
 
 def convertFromHorsePlaceIdToHorsePlace(place):
     for key, value in racetrack_mappings.items():
@@ -48,6 +47,23 @@ def getRaceURL(race_num):
     url = "https://db.netkeiba.com/race/" + race_num
 
     return url
+
+def getDateForDataAnalysis(year,month,day):
+    #Todo:暫定
+    normalyear = [0,1,2,3,4,5,6,7,8,9,10,11,12]
+    normalyear = [0,1,2,3,4,5,6,7,8,9,10,11,12]
+    totalval = 1
+
+    for tmp_year in range(2001,2050):
+        for tmp_month in range(1,13):
+            for tmp_day in range(1,32):
+                if(year == tmp_year and month == tmp_month and day == tmp_day):
+                    return totalval
+                else:
+                    totalval = totalval + 1
+
+    return 0
+
 
 def getHorseInfo(horse_id):
     this_horse_id   = ''
@@ -157,7 +173,7 @@ def getRaceResultLocal(year,month,day,race_num,place_num):
         #1回だけリトライ
         print(f"Error:{e}")
         print("Retrying in 10 seconds...")
-        time.sleep(1)
+        time.sleep(0.1)
         race_request = requests.get(url)
         race_request.encoding = "EUC-JP"
 
@@ -173,14 +189,14 @@ def getRaceResultLocal(year,month,day,race_num,place_num):
 
     return race_results_data_frame
 
-def getThisYearRace():    
-    for horse_num in object_this_year_race:
-        df_ = pd.DataFrame()
-        horse = Horse(horse_num[0],horse_num[1])
-        horse.initializeHorse()
-        list = horse.makeDataFrame(False, 1)
-        df_ = df_.append(list, ignore_index=True)
-        print(horse_num[0])
-        print(df_)
+#def getThisYearRace():    
+#    for horse_num in object_this_year_race:
+#        df_ = pd.DataFrame()
+#        horse = Horse(horse_num[0],horse_num[1])
+#        horse.initializeHorse()
+#        list = horse.makeDataFrame(False, 1)
+#        df_ = df_.append(list, ignore_index=True)
+#        print(horse_num[0])
+#        print(df_)
 
 
