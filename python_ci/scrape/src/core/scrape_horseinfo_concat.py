@@ -99,14 +99,10 @@ FORCE_BREAK = False
 
 
 def main():
-    print("start")
-
     for list in horse_race_lists:
-        makeRaceInfo(list[0],list[1],list[2])    
+        makeRaceInfo(list[0],list[1],list[2],list[3])    
 
-def makeRaceInfo(day,racename,horse_id_list):
-    print("start")
-
+def makeRaceInfo(day,racename,horse_id_list,force_get_last_5race):
     df = pd.DataFrame()
     OBJECT_DAY = day
     RACE_NAME  = racename
@@ -117,18 +113,17 @@ def makeRaceInfo(day,racename,horse_id_list):
 
     jbc_counter = 202001
     for horse_id in horse_id_list:
-        horse_info_path ='/home/msuda/workspace/vscode/horserace/python_ci/csv/horse_id/' + str(horse_id) +'.csv'
+        horse_info_path ='./python_ci/csv/scrape/horse_id/' + str(horse_id) +'.csv'
 
         is_file = os.path.isfile(horse_info_path)
-        if is_file:
-            print("file exists")
-        else:
+        if is_file == False:
             horse_info_data_frame = getHorseInfo(horse_id)
             print(horse_info_data_frame)
             horse_info_data_frame.to_csv(horse_info_path)     
+        else:
+            horse_info_data_frame = pd.read_csv(horse_info_path,index_col=0 )
 
-        horse_info_data_frame = pd.read_csv(horse_info_path,index_col=0 )
-
+        #レース除外、中止等のケースは取り除いておく
         horse_info_data_frame = horse_info_data_frame[horse_info_data_frame['着順'] != '除']
         horse_info_data_frame = horse_info_data_frame[horse_info_data_frame['着順'] != '取']
         horse_info_data_frame = horse_info_data_frame[horse_info_data_frame['馬体重'] != '計不']
@@ -169,7 +164,45 @@ def makeRaceInfo(day,racename,horse_id_list):
         g3_age4 = []
         money   = []
 
+        labellists = [
+            ['horse_id'       , horse_id_set],
+            ['sex'            , sex],
+            ['age'            , age],
+            ['date'           , date],
+            ['dateforda'      , dateforda],
+            ['track'          , track],
+            ['weather'        , weather],
+            ['race_num'       , race_num],
+            ['horse_num_anim' , horse_race_anim],
+            ['horse_num'      , horse_num],
+            ['odds'           , odds],
+            ['popularity'     , popularity],
+            ['order'          , order],
+            ['order_complex'  , order_complex],
+            ['jockey'         , jockey],
+            ['weight'         , weight],
+            ['dirt_grass'     , dirt_grass],
+            ['distance'       , distance],
+            ['condition'      , condition],
+            ['time'           , time],
+            ['3furlong'       , furlong3],
+            ['horse_weight'   , horse_weight],
+            ['weight_incdec'  , weight_incdec],
+            ['same_track'     , same_track],
+            ['g1_age3'        , g1_age3],
+            ['g2_age3'        , g2_age3],
+            ['g3_age3'        , g3_age3],
+            ['g1_age4'        , g1_age4],
+            ['g2_age4'        , g2_age4],
+            ['g3_age4'        , g3_age4],
+            ['money'          , money]
+        ]
+
         #レースから照合するためのパラメータを取得
+        #以下は
+        #https://db.netkeiba.com/horse/xxxxxxxxxx/
+        #からスクレイピングしている
+
         for tmp_place in horse_info_data_frame['開催']:
             horse_id_set.append(horse_id)
 
@@ -178,7 +211,7 @@ def makeRaceInfo(day,racename,horse_id_list):
             place.append(tmp2_place)
 
         for tmp_place in horse_info_data_frame['開催']:
-            #todo 
+            #todo GOR-25 大井で決め打ちになっているが、開催競馬場を変更できるようにする
             if(tmp_place == '大井'):
                 same_track.append(1)
             else:
@@ -267,30 +300,27 @@ def makeRaceInfo(day,racename,horse_id_list):
             tmp2_money = tmp_money
             if math.isnan(tmp_money):
                 tmp2_money = 0.0
-            #money_split_list = tmp_money.split(',.')
-            #if(len(money_split_list)==2):
-            #    money_num = int(money_split_list[0])
-            #else:
-            #    money_num = int(money_split_list[0])*1000 + int(money_split_list[1])
             money.append(tmp2_money)
-        #調教師を追加したい→転厩の可能性があるので、ここでアペンド
-        #オーナーを追加したい→別ファイル
 
+        #Todo 調教師を追加したい→転厩の可能性があるので、レース毎にアペンド予定
+        #Todo オーナーを追加したい
 
         #各レース情報を別で引っ張ってくる
+        #https://db.netkeiba.com/race/xxxxxxxxxxxx/
+        #からとってきている
         for num in range(len(date)):
             hasraceinfo = True
             tmp = date[num].split('/')
-            #print(type(tmp[0]))
 
             dateforda.append(getDateForDataAnalysis(int(tmp[0]),int(tmp[1]),int(tmp[2])))
-            dateforda
 
-            if len(place[num]) == 3  :
+            if len(place[num]) == 2  :
                 if(place[num] =='韓国'):
                         tmp_racetrack = racetrack_mappings['韓国']
+                else :
+                        tmp_racetrack = racetrack_mappings[place[num]]
 
-            if len(place[num]) == 3  :
+            elif len(place[num]) == 3  :
                 if(place[num] =='ソウル'):
                         tmp_racetrack = racetrack_mappings['ソウル']
                 elif(place[num] =='名古屋'):
@@ -298,6 +328,7 @@ def makeRaceInfo(day,racename,horse_id_list):
                 elif(place[num] =='宇都宮'):
                         tmp_racetrack = racetrack_mappings['宇都宮']
                 else:
+                    #todo:中央競馬のはずだが、いらない可能性がある
                     tmp_racetrack = racetrack_mappings[place[num][1:3]]
             elif len(place[num]) == 4 or len(place[num]) == 5  :
                 if(place[num] =='メイダン'):
@@ -317,12 +348,10 @@ def makeRaceInfo(day,racename,horse_id_list):
                 else:
                     #todo:暫定で中央競馬
                     tmp_racetrack = racetrack_mappings[place[num][1:3]]
-            else :
-                tmp_racetrack = racetrack_mappings[place[num]]
+            else:
+                assert print("track not exist.")
 
             tmp_place =str(tmp_racetrack)
-            #print(tmp_place)
-            #print(type(race_num[num]))
 
             print(tmp_racetrack)
             if tmp_racetrack > 10 and tmp_racetrack <= 100   :
@@ -366,7 +395,7 @@ def makeRaceInfo(day,racename,horse_id_list):
 
                 assert len(race_id) == 12 ,print("assert!")
 
-            race_info_path ='/home/msuda/workspace/vscode/horserace/python_ci/csv/race_id/' + race_id +'.csv'
+            race_info_path ='./python_ci/csv/scrape/race_id/' + race_id +'.csv'
             is_file = os.path.isfile(race_info_path)
             if is_file:
                 print(race_info_path+":file exists")
@@ -374,13 +403,12 @@ def makeRaceInfo(day,racename,horse_id_list):
                 print(race_info_path+":file not exists")
                 assert len(race_id) == 12 ,print("assert!")
 
+                #todo 中央と地方で関数をまとめる
                 if tmp_racetrack <= 10:
                     race_info_data_frame = getRaceResultJRA(int(tmp[0]),int(tmp[1]),int(tmp[2]),race_num[num],racetrack_mappings[place[num][1:3]],int(tmp_kaisai),int(tmp_week))
                 else:
                     race_info_data_frame = getRaceResultLocal(int(tmp[0]),int(tmp[1]),int(tmp[2]),int(race_num[num]),racetrack_mappings[place[num]])
 
-
-                #if isinstance(race_info_data_frame,list) and not race_info_data_frame :continue
                 try:
                     race_info_data_frame.to_csv(race_info_path) 
                 except:
@@ -434,10 +462,10 @@ def makeRaceInfo(day,racename,horse_id_list):
                 tmp_age = tmp_each_race_df['性齢'].values[0][1:]
                 age.append(tmp_age)
 
-
                 tmp_track = tmp_racetrack
                 track.append(tmp_track)
 
+                #馬情報取得時に設定済み
                 #weather_mapping={'晴':4,'曇':3,'小雨':2,'雨':1}
                 #tmp_weather = weather_mapping[tmp_each_race_df['天気']]
                 #weather.append(tmp_weather)
@@ -449,7 +477,6 @@ def makeRaceInfo(day,racename,horse_id_list):
                 #horse_race_anim.append(tmp_horse_race_anim)
 
                 tmp_odds = tmp_each_race_df['単勝'].values[0]
-                print(tmp_odds)
                 odds.append(tmp_odds)
 
                 tmp_horse_race_anim = tmp_each_race_df['人気'].values[0]
@@ -463,7 +490,7 @@ def makeRaceInfo(day,racename,horse_id_list):
                 order_complex.append(tmp3_order)
 
                 tmp2_jockey = tmp_each_race_df['騎手'].values[0]
-                print(type(tmp2_jockey))
+
                 try:
                     tmp_jockey = jockey_mappings[tmp2_jockey]
                 except:
@@ -507,103 +534,27 @@ def makeRaceInfo(day,racename,horse_id_list):
                 elif(len(tmp_weight_incdec)==5):
                     weight_incdec.append(str(int(tmp_weight_incdec[1:4])))
 
-        #print(distance)
         horse_info_data_frame2 = pd.DataFrame()
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'horse_id',horse_id_set)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'sex', sex)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'age', age)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'date', date)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'dateforda', dateforda)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'track', track)        
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'weather', weather)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'race_num', race_num)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'horse_num_anim', horse_race_anim)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'horse_num', horse_num)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'odds', odds)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'popularity', popularity)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'order', order)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'order_complex', order_complex)
-        loc = len(horse_info_data_frame2.columns)        
-        horse_info_data_frame2.insert(loc, 'jockey', jockey)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'weight', weight)
-        #print(dirt_grass)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'dirt_grass', dirt_grass)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'distance', distance)
-        loc = loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'condition', condition)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'time', time)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, '3furlong', furlong3)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'horse_weight', horse_weight)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'weight_incdec', weight_incdec)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'same_track', same_track)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'g1_age3', g1_age3)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'g2_age3', g2_age3)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'g3_age3', g3_age3)        
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'g1_age4', g1_age4)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'g2_age4', g2_age4)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'g3_age4', g2_age4)
-        loc = len(horse_info_data_frame2.columns)
-        horse_info_data_frame2.insert(loc, 'money',  money)
-
-        print("---")
-        print(horse_info_data_frame)
-        print("---")
-
-        print(horse_info_data_frame2)
-        horse_info_new_path ='/home/msuda/workspace/vscode/horserace/python_ci/csv/horse_id_new/' + str(horse_id) +'.csv'
-        horse_info_data_frame2.to_csv(horse_info_new_path)
-
-        count = 0
-        #print(horse_info_data_frame2.iloc[0:5,:])
+        for labellist in labellists:
+            loc = len(horse_info_data_frame2.columns)    
+            horse_info_data_frame2.insert(loc, labellist[0],labellist[1])
 
         counter = 0
 
         for index in range (0,len(horse_info_data_frame2)):
             findIndex = False
             hoge2 = horse_info_data_frame2.iloc[index,3]
-            print(hoge2)
-            #
-            if hoge2  == OBJECT_DAY or FORCE_BREAK == True:
+
+            if hoge2  == OBJECT_DAY or force_get_last_5race == True:
                 findIndex = True
                 break
             else:
                 counter = counter +1
 
-        if findIndex == False:
-            counter=0
-            counter_last_5 = counter
-            counter_last5_plus_5 = counter_last_5 + 5
-        else:
-            counter_last_5 = counter + 1
-            counter_last5_plus_5 = counter_last_5 + 5
+        assert(findIndex == True)
+        
+        counter_last_5 = counter + 1
+        counter_last5_plus_5 = counter_last_5 + 5
 
         print('---------------train_data---------------')
         print(horse_info_data_frame2.iloc[counter_last_5:counter_last5_plus_5,:])
@@ -615,27 +566,21 @@ def makeRaceInfo(day,racename,horse_id_list):
 
         #訓練データ
         teiou_train_2023_df = teiou_train_2023_df.append(horse_info_data_frame2.iloc[counter_last_5:counter_last5_plus_5,:])
-        horse_info_new_path ='/home/msuda/workspace/vscode/horserace/python_ci/csv/horse_id_new/JBC2022/'+ 'train_' + str(race_id) +'.csv'
-        horse_info_data_frame2.iloc[counter_last_5:counter_last5_plus_5,:].to_csv(horse_info_new_path)
-
 
         #テストデータ
         if findIndex == True:
-            horse_info_new_path ='/home/msuda/workspace/vscode/horserace/python_ci/csv/horse_id_new/JBC2022/'+ 'test_' + str(race_id) +'.csv'
-            horse_info_data_frame2.iloc[counter:counter+1,:].to_csv(horse_info_new_path)
             teiou_test_2023_df = teiou_test_2023_df.append(horse_info_data_frame2.iloc[counter:counter+1,:])
         else:
-            print("test data not made")
+            print("warning:test data not made:" + race_id)
 
         jbc_counter = jbc_counter + 1
 
-    horse_info_new_path ='/home/msuda/workspace/vscode/horserace/python_ci/csv/horse_id_new/JBC2022/'+'train_'+RACE_NAME+'.csv'
+    horse_info_new_path ='./python_ci/csv/learning/'+'train_'+RACE_NAME+'.csv'
     teiou_train_2023_df.to_csv(horse_info_new_path)
 
     if(teiou_test_2023_df.empty != True):
-        horse_info_new_path ='/home/msuda/workspace/vscode/horserace/python_ci/csv/horse_id_new/JBC2022/'+'test_'+RACE_NAME+'.csv'
+        horse_info_new_path ='./python_ci/csv/learning/'+'test_'+RACE_NAME+'.csv'
         teiou_test_2023_df.to_csv(horse_info_new_path)
-
 
 if __name__ == "__main__":
     main()
