@@ -1,2 +1,2 @@
-,horse_id,sex,age,date,dateforda,track,weather,race_num,horse_num_anim,horse_num,odds,popularity,order,jockey,weight,dirt_grass,distance,condition,time,3furlong,horse_weight,weight_incdec,same_track,g1_age3,g2_age3,g3_age3,g1_age4,g2_age4,g3_age4,money
-9,2011105425,3,6,2017/11/03,6265,44,6,9,13,4,500.5,10.0,0,5269,57,2,2000,2,127.7,39.8,490,-4,1,0,0,0,1,0,0,0.0
+,horse_id,sex,age,date,dateforda,track,weather,race_num,horse_num_anim,horse_num,odds,popularity,order,order_complex,jockey,weight,dirt_grass,distance,condition,time,3furlong,horse_weight,weight_incdec,same_track,g1_age3,g2_age3,g3_age3,g1_age4,g2_age4,g3_age4,money
+14,2011105425,3,6,2017/06/28,6135,44,5,11,16,12,333.8,9.0,0,0,5269,57,2,2000,2,127.1,39.1,491,-1,1,0,0,0,1,0,0,0.0

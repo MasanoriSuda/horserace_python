@@ -1,2 +1,2 @@
-,horse_id,sex,age,date,dateforda,track,weather,race_num,horse_num_anim,horse_num,odds,popularity,order,jockey,weight,dirt_grass,distance,condition,time,3furlong,horse_weight,weight_incdec,same_track,g1_age3,g2_age3,g3_age3,g1_age4,g2_age4,g3_age4,money
-46,2014103477,3,5,2019/12/29,7066,44,6,10,13,6,381.0,9.0,0,1025,57.0,2,2000,3,126.7,39.2,481,3,1,0,0,0,1,0,0,0.0
+,horse_id,sex,age,date,dateforda,track,weather,race_num,horse_num_anim,horse_num,odds,popularity,order,order_complex,jockey,weight,dirt_grass,distance,condition,time,3furlong,horse_weight,weight_incdec,same_track,g1_age3,g2_age3,g3_age3,g1_age4,g2_age4,g3_age4,money
+46,2014103477,3,5,2019/12/29,7066,44,6,10,13,6,381.0,9.0,0,0,1025,57.0,2,2000,3,126.7,39.2,481,3,1,0,0,0,1,0,0,0.0
