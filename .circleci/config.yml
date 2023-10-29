@@ -1,28 +1,16 @@
 version: 2
-jobs:
-  build:
-    docker:
-      - image: circleci/python:3.6.3
+jobs: # jobは処理のまとまり、実行環境やいくつかの処理（step）で構成される
+  build: # job名
+    docker: # circleci上でのdockerによる実行環境の指定
+      - image: cimg/python:3.10.2 # 自分の実行環境に合わせる cimgのpythonであればpipenvがインストール済み
     steps:
-      - checkout
+      - checkout # ソースコードをgitからcheckoutする
+      - run: python --version
       - run:
-          name: install dependencies
-          command: |
-            python3 -m pip install --upgrade pip
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install pytest
-            pip install pytest-cov
-            pip install -e ./.
+          name: install
+          command: pipenv install # Pipfileを用いてインストールする
       - run:
           name: run test
-          command: |
-            . venv/bin/activate
-            pytest --junitxml=test-reports/junit.xml
-      - store-test-results:
+          command: pipenv run pytest --junitxml=test-reports/junit.xml # pytest実行の際にテスト結果のレポートを作成する
+      - store_test_results: # テスト結果をCircleCIにアップロード
           path: test-reports
-      - run:
-          name: run test-cov
-          command: |
-            . venv/bin/activate
-            pytest --cov=src
