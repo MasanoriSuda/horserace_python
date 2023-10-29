@@ -15,25 +15,30 @@ from enum import Enum
 from pathlib import Path
 import sys
 
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-print(str(Path(__file__).resolve().parent.parent))
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
+print(str(Path(__file__).resolve().parent.parent.parent))
 
 # 非ライブラリ
-from core.scrape_racetrack import racetrack_mappings
-from core.scrape_horserace_util import (
+from scrape.core.scrape_racetrack import racetrack_mappings
+from scrape.core.scrape_horserace_util import (
     getRaceResultLocal,
     getRaceResultJRA,
     getHorseInfo,
     getDateForDataAnalysis,
+    getobjectraceinfo,
 )
-from core.scrape_jockeytable import jockey_mappings
+from scrape.core.scrape_jockeytable import jockey_mappings
 
 # from config.JBC2023.scrape_config_train_test_objectrace import scrape_config_horse_race_lists, scrape_config_racetrack
-from config.scrape_table import scrape_race_eval_list, Scrape_Race
+from scrape.config.scrape_table import (
+    scrape_race_eval_list,
+    scrapeconfiggetobjectrace,
+)
 
+from learning.core.learning_mlp_pytorch import learning_getobjectreace
 
 # デバッグ情報を出力するかどうか
-DEBUG_INFO = False
+DEBUG_INFO = True
 
 
 class HorseIdNumInfo(Enum):
@@ -109,20 +114,21 @@ class HORSE(Enum):
     HORSE_TRAINER = "調教師"
 
 
-scrape_config_racetrack = ""
+def scrapegetobjectrace():
+    return scrapeconfiggetobjectrace()
 
 
 def main():
-    race = Scrape_Race.JBCCLASSIC2023.value
+    race = scrapegetobjectrace()
+    learning_race = learning_getobjectreace()
+    assert race == learning_race
 
     scrape_config_horse_race_lists = scrape_race_eval_list[race][0]
-    scrape_config_racetrack = scrape_race_eval_list[race][1]
-    print(scrape_race_eval_list[race][0][0][3])
     for list in scrape_config_horse_race_lists:
-        makeRaceInfo(list[0], list[1], list[2], list[3])
+        makeRaceInfo(list[0], list[1], list[2], list[3], race)
 
 
-def makeRaceInfo(day, racename, horse_id_list, force_get_last_5race):
+def makeRaceInfo(day, racename, horse_id_list, force_get_last_5race, race):
     df = pd.DataFrame()
     OBJECT_DAY = day
     RACE_NAME = racename
@@ -160,6 +166,9 @@ def makeRaceInfo(day, racename, horse_id_list, force_get_last_5race):
         ]
         horse_info_data_frame = horse_info_data_frame[
             horse_info_data_frame["天気"].isna() == False
+        ]
+        horse_info_data_frame = horse_info_data_frame[
+            horse_info_data_frame["枠番"].isna() == False
         ]
 
         horse_id_set = []
@@ -242,7 +251,7 @@ def makeRaceInfo(day, racename, horse_id_list, force_get_last_5race):
             place.append(tmp2_place)
 
         for tmp_place in horse_info_data_frame["開催"]:
-            if tmp_place == scrape_config_racetrack:
+            if tmp_place == getobjectraceinfo(race):
                 same_track.append(1)
             else:
                 same_track.append(0)
@@ -350,6 +359,8 @@ def makeRaceInfo(day, racename, horse_id_list, force_get_last_5race):
             if len(place[num]) == 2:
                 if place[num] == "韓国":
                     tmp_racetrack = racetrack_mappings["韓国"]
+                elif place[num] == "香港":
+                    tmp_racetrack = racetrack_mappings["香港"]
                 else:
                     tmp_racetrack = racetrack_mappings[place[num]]
 
@@ -642,6 +653,7 @@ def makeRaceInfo(day, racename, horse_id_list, force_get_last_5race):
                 counter = counter + 1
 
         if findIndex != True:
+            print(horse_info_data_frame2.iloc[0:, :])
             print(OBJECT_DAY + "is not valid")
 
         assert findIndex == True

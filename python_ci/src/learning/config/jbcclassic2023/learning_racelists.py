@@ -52,5 +52,5 @@ race_for_learing_lists_jbcclassic2023 = [
     "KAWASAKI_2021",
     "KAWASAKI_2022",
     "KAWASAKI_2023",
-    #'JBCCLASSIC_2023',
+    "JBCCLASSIC_2023",
 ]

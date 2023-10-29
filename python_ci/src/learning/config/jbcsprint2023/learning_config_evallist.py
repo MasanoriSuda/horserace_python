@@ -5,27 +5,27 @@ evalsample_jbcsprint2023 = torch.tensor(
     [
         # horse_id    sex  age  dateforda  track  weather  race_num  horse_num_anim  horse_num  popularity  order_complex        jockey  weight  dirt_grass  distance  condition time  same_track  g1_age3  g2_age3  g3_age3  g1_age4  g2_age4  g3_age4
         [
-            201.9102383,  #
-            3,  #
-            4,  #
-            84.58,  #
-            44,  #
-            5,  #
-            11,  #
-            16,  #
-            1,  #
-            1,  #
-            1,  #
-            10.88,  #
-            57,  #
-            2,  #
-            20.0,  #
-            4,  #
-            1,  #
-            0,  #
-            0,  #
-            0,  #
-            0,  #
+            201.6105282,  # horse_id
+            3,  # sex
+            4,  # age
+            84.58,  # dateforda
+            44,  # track
+            5,  # weather
+            11,  # race_num
+            16,  # horse_num_anim
+            1,  # horse_num
+            1,  # popularity
+            1,  # order_complex
+            10.88,  # jockey
+            57,  # weight
+            2,  # dirt_grass
+            12.0,  # distance
+            4,  # condition
+            0,  # time
+            1,  # same_track
+            0,  # g1_age3
+            0,  # g2_age3
+            0,  # g3_age3
             1,  #
             0,  #
             0,  #

@@ -12,10 +12,9 @@ evalsample_jbcclassic2023 = torch.tensor(
             44,  # track
             5,  # weather
             11,  # race_num
-            16,  #
-            1,  #
-            1,  #
-            1,  #
+            16,  # horse_num_anim
+            1,  # horse_num
+            1,  # popularity
             10.88,  #
             57,  #
             2,  #
@@ -39,7 +38,6 @@ evalsample_jbcclassic2023 = torch.tensor(
             5,
             11,
             16,
-            1,
             1,
             1,
             10.88,
@@ -67,7 +65,6 @@ evalsample_jbcclassic2023 = torch.tensor(
             16,
             1,
             1,
-            1,
             6.66,
             57,
             2,
@@ -91,7 +88,6 @@ evalsample_jbcclassic2023 = torch.tensor(
             5,
             11,
             16,
-            1,
             1,
             1,
             11.16,
@@ -119,7 +115,6 @@ evalsample_jbcclassic2023 = torch.tensor(
             16,
             1,
             1,
-            1,
             11.26,
             57,
             2,
@@ -143,7 +138,6 @@ evalsample_jbcclassic2023 = torch.tensor(
             5,
             11,
             16,
-            1,
             1,
             1,
             6.66,
@@ -171,7 +165,6 @@ evalsample_jbcclassic2023 = torch.tensor(
             16,
             1,
             1,
-            1,
             11.15,
             57,
             2,
@@ -195,7 +188,6 @@ evalsample_jbcclassic2023 = torch.tensor(
             5,
             11,
             16,
-            1,
             1,
             1,
             55.24,
@@ -223,7 +215,6 @@ evalsample_jbcclassic2023 = torch.tensor(
             16,
             1,
             1,
-            1,
             0,
             57,
             2,
@@ -249,7 +240,6 @@ evalsample_jbcclassic2023 = torch.tensor(
             16,
             1,
             1,
-            1,
             53.42,
             57,
             2,
@@ -273,7 +263,6 @@ evalsample_jbcclassic2023 = torch.tensor(
             5,
             11,
             16,
-            1,
             1,
             1,
             6558.45,
@@ -302,7 +291,6 @@ evalsample_jbcclassic2023 = torch.tensor(
             1,
             1,
             1,
-            0,
             55,
             2,
             20.0,
@@ -325,7 +313,6 @@ evalsample_jbcclassic2023 = torch.tensor(
             5,
             11,
             16,
-            1,
             1,
             1,
             53.42,
@@ -353,7 +340,6 @@ evalsample_jbcclassic2023 = torch.tensor(
             16,
             1,
             1,
-            1,
             52.99,
             55,
             2,
@@ -379,7 +365,6 @@ evalsample_jbcclassic2023 = torch.tensor(
             16,
             1,
             1,
-            1,
             54.04,
             55,
             2,
@@ -403,7 +388,6 @@ evalsample_jbcclassic2023 = torch.tensor(
             5,
             11,
             16,
-            1,
             1,
             1,
             53.28,

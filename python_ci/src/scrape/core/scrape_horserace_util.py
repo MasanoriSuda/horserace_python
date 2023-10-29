@@ -19,6 +19,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 print(str(Path(__file__).resolve().parent.parent))
 
 from core.scrape_racetrack import racetrack_mappings
+from config.scrape_table import scrape_race_eval_list
 
 # def convertFromHorseNameToHorseID(horsename):
 #    for key, value in horse_mappings.items():
@@ -61,7 +62,7 @@ def getRaceURL(race_num):
 
 
 def getDateForDataAnalysis(year, month, day):
-    # Todo:暫定
+    # Todo:暫定で日付を学習用に変更するパラメータ
     normalyear = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     normalyear = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     totalval = 1
@@ -189,3 +190,7 @@ def getRaceResultLocal(year, month, day, race_num, place_num):
     race_results_data_frame = getRaceResultByRaceID(race_id)
 
     return race_results_data_frame
+
+
+def getobjectraceinfo(race):
+    return scrape_race_eval_list[race][1]

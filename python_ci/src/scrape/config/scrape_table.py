@@ -25,6 +25,11 @@ class Scrape_Race(Enum):
     JBCCLASSIC2023 = 0
     JBCSPRINT2023 = 1
     JBCLADIESCLASSIC2023 = 2
+    JBC2NDCLASSIC2023 = 3
+
+
+def scrapeconfiggetobjectrace():
+    return Scrape_Race.JBCCLASSIC2023.value
 
 
 scrape_race_eval_list = [

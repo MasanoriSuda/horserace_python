@@ -24,9 +24,14 @@ class Learning_Race(Enum):
     JBCCLASSIC2023 = 0
     JBCSPRINT2023 = 1
     JBCLADIESCLASSIC2023 = 2
+    JBCC2NDLASSIC2023 = 3
 
 
 learning_race_eval_list = [
     [race_for_learing_lists_jbcclassic2023, evalsample_jbcclassic2023],
     [race_for_learing_lists_jbcsprint2023, evalsample_jbcsprint2023],
 ]
+
+
+def leaningconfigobjctrace():
+    return Learning_Race.JBCCLASSIC2023.value
