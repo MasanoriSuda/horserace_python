@@ -13,13 +13,13 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 print(str(Path(__file__).resolve().parent.parent))
 
 from config.jbcclassic2023.learning_config_evallist import evalsample_jbcclassic2023
-from config.jbcclassic2023.learning_racelists import (
+from config.jbcclassic2023.learning_config_racelists import (
     race_for_learing_train_lists_jbcclassic2023,
     race_for_learing_test_lists_jbcclassic2023,
     race_for_learing_eval_lists_jbcclassic2023,
 )
 from config.jbcsprint2023.learning_config_evallist import evalsample_jbcsprint2023
-from config.jbcsprint2023.learning_racelists import (
+from config.jbcsprint2023.learning_config_racelists import (
     race_for_learing_train_lists_jbcsprint2023,
 )
 

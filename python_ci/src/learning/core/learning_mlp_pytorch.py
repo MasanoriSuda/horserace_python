@@ -14,7 +14,7 @@ import sys
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 print(str(Path(__file__).resolve().parent.parent))
-from config.learning_table import (
+from config.learning_config_table import (
     learning_race_eval_list,
     Learning_Race,
     leaningconfigobjctrace,

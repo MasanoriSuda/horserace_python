@@ -30,7 +30,7 @@ from scrape.core.scrape_horserace_util import (
 from scrape.core.scrape_jockeytable import jockey_mappings
 
 # from config.JBC2023.scrape_config_train_test_objectrace import scrape_config_horse_race_lists, scrape_config_racetrack
-from scrape.config.scrape_table import (
+from scrape.config.scrape_config_table import (
     scrape_race_eval_list,
     scrapeconfiggetobjectrace,
 )
@@ -41,6 +41,7 @@ from learning.core.learning_mlp_pytorch import learning_getobjectreace
 DEBUG_INFO = True
 
 
+#
 class HorseIdNumInfo(Enum):
     HORSE_ID_NUMINFO_HORSE_ID = "horse_id"  # 馬id
     HORSE_ID_NUMINFO_SEX = "sex"  # 性
@@ -56,7 +57,7 @@ class HorseIdNumInfo(Enum):
     HORSE_ID_NUMINFO_ORDER = "order"  # 着順
     HORSE_ID_NUMINFO_JOCKEY = "jockey"  # 騎手
     HORSE_ID_NUMINFO_WEIGHT = "weight"  # 斤量
-    HORSE_ID_NUMINFO_DIRT_GRASS = "dirt_grass"  # ダートor芝
+    HORSE_ID_NUMINFO_DIRT_GRASS = "dirt_grass"  # ダートor芝 or障害
     HORSE_ID_NUMINFO_DISTANCE = "distance"  # 距離
     HORSE_ID_NUMINFO_CONDITION = "condition"  # 馬場コンディション
     HORSE_ID_NUMINFO_TIME = "time"  # タイム
