@@ -23,47 +23,61 @@ from config.learning_table import (
 race_all_lists_test = pd.DataFrame()
 
 
-"""_summary_
-"""
-
-
 def learning_getnnmodel():
+    """_summary_"""
     net = nn.Sequential(
         nn.Linear(22, 256),
         nn.ReLU(),
         nn.Dropout(0.5),
         nn.Linear(256, 128),
         nn.ReLU(),
-        nn.Linear(128, 2),
+        nn.Dropout(0.4),
+        nn.Linear(128, 64),
+        nn.ReLU(),
+        nn.Dropout(0.3),
+        nn.Linear(64, 32),
+        nn.ReLU(),
+        nn.Dropout(0.2),
+        nn.Linear(32, 16),
+        nn.ReLU(),
+        nn.Dropout(0.1),
+        nn.Linear(16, 8),
+        nn.ReLU(),
+        nn.Linear(8, 4),
+        nn.ReLU(),
+        nn.Linear(4, 2),
     )
 
     return net
 
 
-"""_summary_
-"""
-
-
 def learning_tuningdfparam(df):
+    """_summary_"""
     jbc_all_lists_tmp = df
 
     print(df)
 
-    jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns="odds")
+    jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns="horse_id")
+    # jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns="odds")
     jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns="date")
     jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns="weight_incdec")
     jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns="3furlong")
     # jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns='distance')
     jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns="horse_weight")
+    jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns="money")
+    jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns="order_complex")
+    jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns="time")
+    # jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns='weight')
+    # jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns='jockey')
 
-    f_horsediv = lambda x: (x - 1980000000) / 1000000
-    jbc_all_lists_tmp["horse_id"] = jbc_all_lists_tmp["horse_id"].apply(f_horsediv)
+    # f_horsediv = lambda x: (x - 1980000000) / 1000000
+    # jbc_all_lists_tmp["horse_id"] = jbc_all_lists_tmp["horse_id"].apply(f_horsediv)
 
     f_distancediv = lambda x: x / 100
     jbc_all_lists_tmp["distance"] = jbc_all_lists_tmp["distance"].apply(f_distancediv)
 
-    f_money = lambda x: x / 100
-    jbc_all_lists_tmp["money"] = jbc_all_lists_tmp["money"].apply(f_money)
+    # f_money = lambda x: x / 100
+    # jbc_all_lists_tmp["money"] = jbc_all_lists_tmp["money"].apply(f_money)
 
     f_dateda = lambda x: x / 100
     jbc_all_lists_tmp["dateforda"] = jbc_all_lists_tmp["dateforda"].apply(f_dateda)
@@ -71,13 +85,6 @@ def learning_tuningdfparam(df):
     get_odd_even = lambda x: (10000 + x) / 100 if x % 2 == 0 else x / 100
     #    get_odd_even = lambda x: x / 100
     jbc_all_lists_tmp["jockey"] = jbc_all_lists_tmp["jockey"].apply(get_odd_even)
-
-    jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns="money")
-    jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns="order_complex")
-    jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns="horse_id")
-    # jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns='time')
-    # jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns='weight')
-    # jbc_all_lists_tmp = jbc_all_lists_tmp.drop(columns='jockey')
 
     return jbc_all_lists_tmp
 
@@ -87,7 +94,7 @@ def learning_geevaldata():
     jbc_all_lists_tmp = pd.DataFrame()
 
     try:
-        horse_info_new_path = "./python_ci/csv/learning/test_JBCCLASSIC_2023.csv"
+        horse_info_new_path = "./python_ci/csv/learning/JBCCLASSIC_2023_result.csv"
         try:
             jbc_2021_df = pd.read_csv(horse_info_new_path, index_col=0)
         except:
@@ -124,11 +131,9 @@ def learning_settrainandtestdata(race_idx, train_or_test_or_eval):
     elif train_or_test_or_eval == 1:
         TRAIN_OR_TEST = "test_"
     if train_or_test_or_eval == 0 or train_or_test_or_eval == 1:
-        for list in learning_race_eval_list[race_idx][0]:
+        for list in learning_race_eval_list[race_idx][train_or_test_or_eval]:
             try:
-                horse_info_new_path = (
-                    "./python_ci/csv/learning/" + TRAIN_OR_TEST + list + ".csv"
-                )
+                horse_info_new_path = "./python_ci/csv/learning/" + list + "_result.csv"
                 jbc_2021_df = pd.read_csv(horse_info_new_path, index_col=0)
 
                 jbc_all_lists_tmp = jbc_all_lists_tmp.append(jbc_2021_df)
@@ -136,9 +141,7 @@ def learning_settrainandtestdata(race_idx, train_or_test_or_eval):
                 print("file not found")
     else:
         try:
-            horse_info_new_path = (
-                "./python_ci/csv/learning/" + TRAIN_OR_TEST + list + ".csv"
-            )
+            horse_info_new_path = "./python_ci/csv/learning/" + list + "_result.csv"
             jbc_2021_df = pd.read_csv(horse_info_new_path, index_col=0)
 
             jbc_all_lists_tmp = jbc_all_lists_tmp.append(jbc_2021_df)
@@ -261,7 +264,7 @@ def learning_exec(race_idx):
 
     print(list)
 
-    jbc_all_lists_test_tmp2 = race_all_lists_test[["age", "order"]]
+    jbc_all_lists_test_tmp2 = race_all_lists_train[["age", "order"]]
 
     age_order_totals = jbc_all_lists_test_tmp2.groupby("age")["order"].mean()
 

@@ -14,10 +14,14 @@ print(str(Path(__file__).resolve().parent.parent))
 
 from config.jbcclassic2023.learning_config_evallist import evalsample_jbcclassic2023
 from config.jbcclassic2023.learning_racelists import (
-    race_for_learing_lists_jbcclassic2023,
+    race_for_learing_train_lists_jbcclassic2023,
+    race_for_learing_test_lists_jbcclassic2023,
+    race_for_learing_eval_lists_jbcclassic2023,
 )
 from config.jbcsprint2023.learning_config_evallist import evalsample_jbcsprint2023
-from config.jbcsprint2023.learning_racelists import race_for_learing_lists_jbcsprint2023
+from config.jbcsprint2023.learning_racelists import (
+    race_for_learing_train_lists_jbcsprint2023,
+)
 
 
 class Learning_Race(Enum):
@@ -28,8 +32,16 @@ class Learning_Race(Enum):
 
 
 learning_race_eval_list = [
-    [race_for_learing_lists_jbcclassic2023, evalsample_jbcclassic2023],
-    [race_for_learing_lists_jbcsprint2023, evalsample_jbcsprint2023],
+    [
+        race_for_learing_train_lists_jbcclassic2023,
+        race_for_learing_test_lists_jbcclassic2023,
+        race_for_learing_eval_lists_jbcclassic2023,
+    ],
+    [
+        race_for_learing_train_lists_jbcsprint2023,
+        race_for_learing_train_lists_jbcsprint2023,
+        race_for_learing_train_lists_jbcsprint2023,
+    ],
 ]
 
 
