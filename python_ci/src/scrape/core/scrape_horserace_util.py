@@ -19,7 +19,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 print(str(Path(__file__).resolve().parent.parent))
 
 from core.scrape_racetrack import racetrack_mappings
-from config.scrape_table import scrape_race_eval_list
+from config.scrape_config_table import scrape_race_eval_list
 
 # def convertFromHorseNameToHorseID(horsename):
 #    for key, value in horse_mappings.items():

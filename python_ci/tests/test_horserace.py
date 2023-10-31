@@ -7,15 +7,18 @@ print(str(Path(__file__).resolve().parent.parent))
 
 import pytest
 
-from src.learning.config.jbcclassic2023.learning_racelists import (
-    race_for_learing_lists_jbcclassic2023,
+from src.learning.config.jbcclassic2023.learning_config_racelists import (
+    race_for_learing_train_lists_jbcclassic2023,
 )
-from src.learning.config.jbcsprint2023.learning_racelists import (
-    race_for_learing_lists_jbcsprint2023,
+from src.learning.config.jbcsprint2023.learning_config_racelists import (
+    race_for_learing_train_lists_jbcsprint2023,
 )
 
-from src.learning.config.learning_table import Learning_Race, learning_race_eval_list
-from src.scrape.config.scrape_table import Scrape_Race, scrape_race_eval_list
+from src.learning.config.learning_config_table import (
+    Learning_Race,
+    learning_race_eval_list,
+)
+from src.scrape.config.scrape_config_table import Scrape_Race, scrape_race_eval_list
 
 
 def test_verify_race_enum():
