@@ -43,6 +43,7 @@ jobs:
             . venv/bin/activate
             pip install pytest
             pip install pytest-cov
+            pip install torch
       - run:
           name: Run tests
           # This assumes pytest is installed via the install-package step above
