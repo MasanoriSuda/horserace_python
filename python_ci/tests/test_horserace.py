@@ -30,3 +30,4 @@ def test_verify_race_enum():
         Learning_Race.JBCLADIESCLASSIC2023.value
         == Scrape_Race.JBCLADIESCLASSIC2023.value
     )
+    assert Learning_Race.JBCC2NDLASSIC2023.value == Scrape_Race.JBC2NDCLASSIC2023.value
