@@ -41,7 +41,6 @@ from learning.core.learning_mlp_pytorch import learning_getobjectreace
 DEBUG_INFO = True
 
 
-#
 class HorseIdNumInfo(Enum):
     HORSE_ID_NUMINFO_HORSE_ID = "horse_id"  # 馬id
     HORSE_ID_NUMINFO_SEX = "sex"  # 性
@@ -129,6 +128,146 @@ def main():
         makeRaceInfo(list[0], list[1], list[2], list[3], race)
 
 
+def getvalidrace(horse_info_data_frame_src):
+    """_summary_
+    checke whether this race is held in japan or not
+    """
+
+    horse_info_data_frame = horse_info_data_frame_src
+
+    # レース除外、中止、海外レース等のケースは取り除いておく
+    horse_info_data_frame = horse_info_data_frame[horse_info_data_frame["着順"] != "除"]
+    horse_info_data_frame = horse_info_data_frame[horse_info_data_frame["着順"] != "取"]
+    horse_info_data_frame = horse_info_data_frame[horse_info_data_frame["馬体重"] != "計不"]
+    horse_info_data_frame = horse_info_data_frame[horse_info_data_frame["着順"] != "中"]
+    horse_info_data_frame = horse_info_data_frame[
+        horse_info_data_frame["着順"].isna() == False
+    ]
+    horse_info_data_frame = horse_info_data_frame[
+        horse_info_data_frame["天気"].isna() == False
+    ]
+    horse_info_data_frame = horse_info_data_frame[
+        horse_info_data_frame["枠番"].isna() == False
+    ]
+
+    return horse_info_data_frame
+
+
+def addhorseidtolist(horse_id, dataframe):
+    list = []
+    for i in range(0, len(dataframe)):
+        list.append(horse_id)
+
+    return list
+
+
+def adddfdatatolist(label, dataframe):
+    list = []
+    for tmp_data in dataframe[label]:
+        list.append(tmp_data)
+
+    return list
+
+
+def adddistancetolist(label, dataframe):
+    list = []
+    for tmp_distance in dataframe[label]:
+        distance = tmp_distance[1:]
+        list.append(distance)
+
+    return list
+
+
+def addmoneytolist(label, dataframe):
+    list = []
+    for tmp_money in dataframe[label]:
+        tmp2_money = tmp_money
+        if math.isnan(tmp_money):
+            tmp2_money = 0.0
+        list.append(tmp2_money)
+    return list
+
+
+def addtrackcondition(label, dataframe):
+    list = []
+    for tmp2_dirt_or_grass in dataframe[label]:
+        condition_mapping = {"良": 4, "稍": 3, "重": 2, "不": 1}
+        tmp_condition = condition_mapping[tmp2_dirt_or_grass]
+        list.append(tmp_condition)
+    return list
+
+
+def addsametracktolist(label, dataframe, race):
+    list = []
+    for tmp_place in dataframe[label]:
+        if tmp_place == getobjectraceinfo(race):
+            list.append(1)
+        else:
+            list.append(0)
+    return list
+
+
+def addweathertolist(label, dataframe):
+    list = []
+    for tmp_horse_num in dataframe[label]:
+        weather_mapping = {"晴": 6, "曇": 5, "小雨": 4, "雨": 3, "小雪": 2, "雪": 1}
+        tmp_weather = weather_mapping[tmp_horse_num]
+        list.append(tmp_weather)
+    return list
+
+
+def addgrassordirttolist(label, dataframe):
+    list = []
+    for tmp2_dirt_or_grass in dataframe[label]:
+        dirt_mapping = {"芝": 1, "ダ": 2, "障": 3}
+        list.append(dirt_mapping[tmp2_dirt_or_grass[0:1]])
+
+    return list
+
+
+def addgraderaceinfotolist(label, dataframe):
+    g1_age3 = []
+    g2_age3 = []
+    g3_age3 = []
+    g1_age4 = []
+    g2_age4 = []
+    g3_age4 = []
+    for racename in dataframe[label]:
+        if "(G3)" in racename:
+            if "ユニコーン" in racename or "レパード" in racename:
+                g3_age3.append(1)
+                g3_age4.append(0)
+            else:
+                g3_age3.append(0)
+                g3_age4.append(1)
+        else:
+            g3_age3.append(0)
+            g3_age4.append(0)
+
+        if "(G2)" in racename:
+            if "関東オークス" in racename or "兵庫チャンピョン" in racename:
+                g2_age3.append(1)
+                g2_age4.append(0)
+            else:
+                g2_age3.append(0)
+                g2_age4.append(1)
+        else:
+            g2_age3.append(0)
+            g2_age4.append(0)
+
+        if "(G1)" in racename:
+            if "ジャパンダートダ" in racename:
+                g1_age3.append(1)
+                g1_age4.append(0)
+            else:
+                g1_age3.append(0)
+                g1_age4.append(1)
+        else:
+            g1_age3.append(0)
+            g1_age4.append(0)
+    return g1_age3, g1_age4, g2_age3, g2_age4, g3_age3, g3_age4
+
+
 def makeRaceInfo(day, racename, horse_id_list, force_get_last_5race, race):
     df = pd.DataFrame()
     OBJECT_DAY = day
@@ -149,28 +288,7 @@ def makeRaceInfo(day, racename, horse_id_list, force_get_last_5race, race):
         else:
             horse_info_data_frame = pd.read_csv(horse_info_path, index_col=0)
 
-        # レース除外、中止等のケースは取り除いておく
-        horse_info_data_frame = horse_info_data_frame[
-            horse_info_data_frame["着順"] != "除"
-        ]
-        horse_info_data_frame = horse_info_data_frame[
-            horse_info_data_frame["着順"] != "取"
-        ]
-        horse_info_data_frame = horse_info_data_frame[
-            horse_info_data_frame["馬体重"] != "計不"
-        ]
-        horse_info_data_frame = horse_info_data_frame[
-            horse_info_data_frame["着順"] != "中"
-        ]
-        horse_info_data_frame = horse_info_data_frame[
-            horse_info_data_frame["着順"].isna() == False
-        ]
-        horse_info_data_frame = horse_info_data_frame[
-            horse_info_data_frame["天気"].isna() == False
-        ]
-        horse_info_data_frame = horse_info_data_frame[
-            horse_info_data_frame["枠番"].isna() == False
-        ]
+        horse_info_data_frame = getvalidrace(horse_info_data_frame)
 
         horse_id_set = []
         sex = []
@@ -205,143 +323,44 @@ def makeRaceInfo(day, racename, horse_id_list, force_get_last_5race, race):
         g3_age4 = []
         money = []
 
-        labellists = [
-            ["horse_id", horse_id_set],
-            ["sex", sex],
-            ["age", age],
-            ["date", date],
-            ["dateforda", dateforda],
-            ["track", track],
-            ["weather", weather],
-            ["race_num", race_num],
-            ["horse_num_anim", horse_race_anim],
-            ["horse_num", horse_num],
-            ["odds", odds],
-            ["popularity", popularity],
-            ["order", order],
-            ["order_complex", order_complex],
-            ["jockey", jockey],
-            ["weight", weight],
-            ["dirt_grass", dirt_grass],
-            ["distance", distance],
-            ["condition", condition],
-            ["time", time],
-            ["3furlong", furlong3],
-            ["horse_weight", horse_weight],
-            ["weight_incdec", weight_incdec],
-            ["same_track", same_track],
-            ["g1_age3", g1_age3],
-            ["g2_age3", g2_age3],
-            ["g3_age3", g3_age3],
-            ["g1_age4", g1_age4],
-            ["g2_age4", g2_age4],
-            ["g3_age4", g3_age4],
-            ["money", money],
-        ]
-
         # レースから照合するためのパラメータを取得
         # 以下は
         # https://db.netkeiba.com/horse/xxxxxxxxxx/
         # からスクレイピングしている
 
-        for tmp_place in horse_info_data_frame["開催"]:
-            horse_id_set.append(horse_id)
+        # for tmp_place in horse_info_data_frame["開催"]:
+        #    horse_id_set.append(horse_id)
 
-        for tmp_place in horse_info_data_frame["開催"]:
-            tmp2_place = tmp_place
-            place.append(tmp2_place)
+        horse_info_data_frame_tmp = horse_info_data_frame["開催"]
+        horse_id_set = addhorseidtolist(horse_id, horse_info_data_frame_tmp)
 
-        for tmp_place in horse_info_data_frame["開催"]:
-            if tmp_place == getobjectraceinfo(race):
-                same_track.append(1)
-            else:
-                same_track.append(0)
+        place = adddfdatatolist("開催", horse_info_data_frame)
 
-        for tmp_date in horse_info_data_frame["日付"]:
-            date.append(tmp_date)
+        same_track = addsametracktolist("開催", horse_info_data_frame, race)
 
-        for tmp_race_num in horse_info_data_frame["R"]:
-            if math.isnan(tmp_race_num):
-                race_num.append(11.0)
-            else:
-                race_num.append(tmp_race_num)
+        date = adddfdatatolist("日付", horse_info_data_frame)
 
-        for tmp_horse_num in horse_info_data_frame["馬番"]:
-            horse_num.append(tmp_horse_num)
+        race_num = adddfdatatolist("R", horse_info_data_frame)
 
-        for tmp_horse_race_anim in horse_info_data_frame["頭数"]:
-            horse_race_anim.append(tmp_horse_race_anim)
+        horse_num = adddfdatatolist("馬番", horse_info_data_frame)
 
-        for tmp_horse_num in horse_info_data_frame["天気"]:
-            weather_mapping = {"晴": 6, "曇": 5, "小雨": 4, "雨": 3, "小雪": 2, "雪": 1}
-            tmp_weather = weather_mapping[tmp_horse_num]
-            weather.append(tmp_weather)
+        horse_race_anim = adddfdatatolist("頭数", horse_info_data_frame)
 
-        for tmp2_dirt_or_grass in horse_info_data_frame["距離"]:
-            tmp_dirt_or_grass = tmp2_dirt_or_grass[0]
-            if tmp_dirt_or_grass == "芝":
-                dirt_grass.append("1")
-            elif tmp_dirt_or_grass == "ダ":
-                dirt_grass.append("2")
-            elif tmp_dirt_or_grass == "障":
-                dirt_grass.append("3")
-            else:
-                assert print(
-                    "this race is neither grass nor dirt param :" + tmp_dirt_or_grass
-                )
+        weather = addweathertolist("天気", horse_info_data_frame)
 
-        # 各グレードレースへの出場経験を確認する
-        for racename in horse_info_data_frame["レース名"]:
-            if "(G3)" in racename:
-                if "ユニコーン" in racename or "レパード" in racename:
-                    g3_age3.append(1)
-                    g3_age4.append(0)
-                else:
-                    g3_age3.append(0)
-                    g3_age4.append(1)
-            else:
-                g3_age3.append(0)
-                g3_age4.append(0)
+        dirt_grass = addgrassordirttolist("距離", horse_info_data_frame)
 
-            if "(G2)" in racename:
-                if "関東オークス" in racename or "兵庫チャンピョン" in racename:
-                    g2_age3.append(1)
-                    g2_age4.append(0)
-                else:
-                    g2_age3.append(0)
-                    g2_age4.append(1)
-            else:
-                g2_age3.append(0)
-                g2_age4.append(0)
+        distance = adddistancetolist("距離", horse_info_data_frame)
 
-            if "(G1)" in racename:
-                if "ジャパンダートダ" in racename:
-                    g1_age3.append(1)
-                    g1_age4.append(0)
-                else:
-                    g1_age3.append(0)
-                    g1_age4.append(1)
-            else:
-                g1_age3.append(0)
-                g1_age4.append(0)
+        condition = addtrackcondition("馬場", horse_info_data_frame)
 
-        for tmp2_dirt_or_grass in horse_info_data_frame["距離"]:
-            length = tmp2_dirt_or_grass[1:]
-            distance.append(length)
+        furlong3 = adddfdatatolist("上り", horse_info_data_frame)
 
-        for tmp2_dirt_or_grass in horse_info_data_frame["馬場"]:
-            condition_mapping = {"良": 4, "稍": 3, "重": 2, "不": 1}
-            tmp_condition = condition_mapping[tmp2_dirt_or_grass]
-            condition.append(tmp_condition)
+        money = addmoneytolist("賞金", horse_info_data_frame)
 
-        for tmp_furlong in horse_info_data_frame["上り"]:
-            furlong3.append(tmp_furlong)
-
-        for tmp_money in horse_info_data_frame["賞金"]:
-            tmp2_money = tmp_money
-            if math.isnan(tmp_money):
-                tmp2_money = 0.0
-            money.append(tmp2_money)
+        g1_age3, g1_age4, g2_age3, g2_age4, g3_age3, g3_age4 = addgraderaceinfotolist(
+            "レース名", horse_info_data_frame
+        )
 
         # Todo 調教師を追加したい→転厩の可能性があるので、レース毎にアペンド予定
         # Todo オーナーを追加したい
@@ -358,33 +377,11 @@ def makeRaceInfo(day, racename, horse_id_list, force_get_last_5race, race):
             )
 
             if len(place[num]) == 2:
-                if place[num] == "韓国":
-                    tmp_racetrack = racetrack_mappings["韓国"]
-                elif place[num] == "香港":
-                    tmp_racetrack = racetrack_mappings["香港"]
-                else:
-                    tmp_racetrack = racetrack_mappings[place[num]]
-
+                tmp_racetrack = racetrack_mappings[place[num]]
             elif len(place[num]) == 3:
-                if place[num] == "ソウル":
-                    tmp_racetrack = racetrack_mappings["ソウル"]
-                elif place[num] == "名古屋":
-                    tmp_racetrack = racetrack_mappings["名古屋"]
-                elif place[num] == "宇都宮":
-                    tmp_racetrack = racetrack_mappings["宇都宮"]
-                else:
-                    # todo:中央競馬のはずだが、いらない可能性が高い
-                    tmp_racetrack = racetrack_mappings[place[num][1:3]]
+                tmp_racetrack = racetrack_mappings[place[num]]
             elif len(place[num]) == 4 or len(place[num]) == 5:
-                if place[num] == "メイダン":
-                    tmp_racetrack = racetrack_mappings["メイダン"]
-                elif place[num] == "キングア":
-                    tmp_racetrack = racetrack_mappings["キングア"]
-                elif place[num] == "チャーチ":
-                    tmp_racetrack = racetrack_mappings["チャーチ"]
-                elif place[num] == "アラブ首":
-                    tmp_racetrack = racetrack_mappings["アラブ首"]
-                elif place[num] == "札幌(地)":
+                if place[num] == "札幌(地)":
                     tmp_racetrack = racetrack_mappings["札幌(地)"]
                 elif place[num] == "中京(地)":
                     tmp_racetrack = racetrack_mappings["中京(地)"]
@@ -410,55 +407,6 @@ def makeRaceInfo(day, racename, horse_id_list, force_get_last_5race, race):
                     else "0" + str(int(race_num[num]))
                 )
                 race_id = tmp[0] + str(tmp_day) + tmp[1] + tmp[2] + tmp_race  # 年+開催+月日
-            elif tmp_racetrack > 100:
-                if tmp_racetrack == 101:
-                    # メイダン
-                    tmp_day = (
-                        str(tmp_racetrack)
-                        if tmp_racetrack >= 10
-                        else "0" + str(tmp_racetrack)
-                    )
-                    race_id = (
-                        tmp[0] + "J0" + tmp[1] + tmp[2] + str(race_num[num])
-                    )  # 年+開催+月日
-                elif tmp_racetrack == 102:
-                    # キングア
-                    tmp_day = (
-                        str(tmp_racetrack)
-                        if tmp_racetrack >= 10
-                        else "0" + str(tmp_racetrack)
-                    )
-                    race_id = tmp[0] + "P0a00108"  # 年+開催+月日
-                elif tmp_racetrack == 103 or tmp_racetrack == 106:
-                    # ソウル
-                    tmp_day = (
-                        str(tmp_racetrack)
-                        if tmp_racetrack >= 10
-                        else "0" + str(tmp_racetrack)
-                    )
-                    race_id = (
-                        tmp[0] + "K0" + tmp[1] + tmp[2] + str(race_num[num])
-                    )  # 年+開催+月日
-                elif tmp_racetrack == 104:
-                    # チャーチ
-                    tmp_day = (
-                        str(tmp_racetrack)
-                        if tmp_racetrack >= 10
-                        else "0" + str(tmp_racetrack)
-                    )
-                    race_id = (
-                        tmp[0] + "F0" + tmp[1] + tmp[2] + str(race_num[num])
-                    )  # 年+開催+月日
-                elif tmp_racetrack == 105:
-                    # チャーチ
-                    tmp_day = (
-                        str(tmp_racetrack)
-                        if tmp_racetrack >= 10
-                        else "0" + str(tmp_racetrack)
-                    )
-                    race_id = tmp[0] + "C700704"  # 年+開催+月日
-                else:
-                    assert print("race has not found")
             else:
                 tmp_day = (
                     str(tmp_racetrack)
@@ -635,6 +583,40 @@ def makeRaceInfo(day, racename, horse_id_list, force_get_last_5race, race):
                     weight_incdec.append(str(int(tmp_weight_incdec[1:3])))
                 elif len(tmp_weight_incdec) == 5:
                     weight_incdec.append(str(int(tmp_weight_incdec[1:4])))
+
+        labellists = [
+            ["horse_id", horse_id_set],
+            ["sex", sex],
+            ["age", age],
+            ["date", date],
+            ["dateforda", dateforda],
+            ["track", track],
+            ["weather", weather],
+            ["race_num", race_num],
+            ["horse_num_anim", horse_race_anim],
+            ["horse_num", horse_num],
+            ["odds", odds],
+            ["popularity", popularity],
+            ["order", order],
+            ["order_complex", order_complex],
+            ["jockey", jockey],
+            ["weight", weight],
+            ["dirt_grass", dirt_grass],
+            ["distance", distance],
+            ["condition", condition],
+            ["time", time],
+            ["3furlong", furlong3],
+            ["horse_weight", horse_weight],
+            ["weight_incdec", weight_incdec],
+            ["same_track", same_track],
+            ["g1_age3", g1_age3],
+            ["g2_age3", g2_age3],
+            ["g3_age3", g3_age3],
+            ["g1_age4", g1_age4],
+            ["g2_age4", g2_age4],
+            ["g3_age4", g3_age4],
+            ["money", money],
+        ]
 
         horse_info_data_frame2 = pd.DataFrame()
         for labellist in labellists:
