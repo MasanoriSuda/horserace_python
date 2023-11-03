@@ -15,11 +15,11 @@ import datetime
 from pathlib import Path
 import sys
 
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-print(str(Path(__file__).resolve().parent.parent))
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent.parent.parent))
+print(str(Path(__file__).resolve().parent.parent.parent.parent.parent))
 
-from core.scrape_racetrack import racetrack_mappings
-from config.scrape_config_table import scrape_race_eval_list
+from python_ci.src.scrape.core.scrape_racetrack_table import racetrack_mappings
+from python_ci.src.scrape.config.scrape_config_table import scrape_race_eval_list
 
 # def convertFromHorseNameToHorseID(horsename):
 #    for key, value in horse_mappings.items():
