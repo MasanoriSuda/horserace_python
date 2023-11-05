@@ -17,20 +17,11 @@ import sys
 
 sys.path.append(str(Path(__file__).resolve().parent.parent.parent.parent.parent))
 print("hoge")
-print(str(Path(__file__).resolve().parent.parent.parent))
 print(str(Path(__file__).resolve().parent.parent.parent.parent.parent))
 
 # 非ライブラリ
-from python_ci.src.scrape.core.scrape_racetrack_table import racetrack_mappings
-from python_ci.src.scrape.core.scrape_horserace_util import (
-    getRaceResultByRaceID,
-    getHorseInfo,
-    getDateForDataAnalysis,
-    getobjectraceinfo,
-    getRaceURL,
-    getRaceResultByRaceID,
-)
-from python_ci.src.scrape.core.scrape_jockeytable import jockey_mappings
+from python_ci.src.scrape.core.scrape_table_racetrack import racetrack_mappings
+from python_ci.src.scrape.core.scrape_class_horse import Horse
 
 # from config.JBC2023.scrape_config_train_test_objectrace import scrape_config_horse_race_lists, scrape_config_racetrack
 from python_ci.src.scrape.config.scrape_config_table import (
@@ -41,13 +32,35 @@ from python_ci.src.scrape.config.scrape_config_table import (
 
 class Race:
     race_id = ""
+    race_results_data_frame = []
 
-    def __init__(self, race_id):
-        assert len(race_id) == 12
-        self.race_id = race_id
+    def get_race_url(self, race_num):
+        url = "https://db.netkeiba.com/race/" + race_num
 
-    def getRaceResultByRaceID(self):
-        url = getRaceURL(self.race_id)
+        return url
+
+    def is_exist_race_id_info_csv(self):
+        race_info_path = "./python_ci/csv/scrape/race_id/" + str(self.race_id) + ".csv"
+
+        is_file = os.path.isfile(race_info_path)
+
+        assert is_file == True
+
+        return is_file
+
+    def get_race_id_info_from_csv(self):
+        race_info_path = "./python_ci/csv/scrape/race_id/" + str(self.race_id) + ".csv"
+        race_info_data_frame = pd.read_csv(race_info_path, index_col=0)
+
+        return race_info_data_frame
+
+    def set_race_id_info_to_csv(self, df):
+        # print(df)
+        race_info_path = "./python_ci/csv/scrape/race_id/" + str(self.race_id) + ".csv"
+        df.to_csv(race_info_path)
+
+    def get_race_result_by_race_id(self):
+        url = self.get_race_url(self.race_id)
         race_results_data_frame = []
 
         try:
@@ -81,14 +94,26 @@ class Race:
                 print(dfs[0], end="\n\n")
 
                 race_results_data_frame = dfs[0]
+            self.race_results_data_frame = race_results_data_frame
         return race_results_data_frame
 
+    def make_race_id_data(self):
+        if self.is_exist_race_id_info_csv() == True:
+            self.race_results_data_frame = self.get_race_id_info_from_csv()
+        else:
+            df = self.get_race_result_by_race_id()
+            print(df)
+            self.set_race_id_info_to_csv(df)
+            self.race_results_data_frame = df
 
-def main():
-    race = Race("202346092610")
-    df = race.getRaceResultByRaceID()
-    print(df)
+    def __init__(self, race_id):
+        print(race_id)
+        assert len(str(race_id)) == 12
+        self.race_id = str(race_id)
+        self.make_race_id_data()
 
-
-if __name__ == "__main__":
-    main()
+    def get_sex_and_age(self, gate_num):
+        tmp_each_race_df = self.race_results_data_frame.query("馬番 == @gate_num")
+        # "性齢" 列の値を抽出
+        sex_and_age = tmp_each_race_df.loc[tmp_each_race_df.index[0], "性齢"]
+        return sex_and_age
